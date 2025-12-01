@@ -8,6 +8,7 @@ use core::{convert::TryInto, panic};
 use alloc::{format, vec};
 use proptest::prelude::*;
 use rand::rngs::OsRng;
+use rand::{Rng, RngCore};
 use sha2::Sha256;
 
 use crate::{
@@ -365,8 +366,9 @@ value1 in prop::collection::vec(any::<u8>(), 1..10), value2 in prop::collection:
 
         let mut leaf_keys: Vec<(NodeKey, KeyHash)> = vec![];
 
+        let rg1 = OsRng.gen::<u8>();
         leaf_keys.push(gen_leaf_keys(0 /* version */, internal_node_key.nibble_path(),
-         vec![index0, Nibble::from(OsRng.gen::<u8>() % 16)]));
+         vec![index0, Nibble::from(rg1 % 16)]));
 
         let internal2_node_key = gen_node_keys(0 /* version */, internal_node_key.nibble_path(), vec![2.into()]);
 
@@ -377,7 +379,8 @@ value1 in prop::collection::vec(any::<u8>(), 1..10), value2 in prop::collection:
         leaf_keys.push(gen_leaf_keys(0, internal3_node_key.nibble_path(), vec![index3]));
         leaf_keys.push(gen_leaf_keys(0, internal3_node_key.nibble_path(), vec![index4]));
 
-        leaf_keys.push(gen_leaf_keys(0 /* version */, internal_node_key.nibble_path(), vec![index5, Nibble::from(OsRng.gen::<u8>() % 16)]));
+        let rg2 = OsRng.gen::<u8>();
+        leaf_keys.push(gen_leaf_keys(0 /* version */, internal_node_key.nibble_path(), vec![index5, Nibble::from(rg2 % 16)]));
 
         let mut leaves: Vec<Node> = vec![];
         let mut leaf_hashes: Vec<[u8;32]> = vec![];
